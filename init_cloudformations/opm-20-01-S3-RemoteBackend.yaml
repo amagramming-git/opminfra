@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  SystemPrefix:
+    Type: "String"
+    Default: "opm"
+    AllowedValues:
+      - "opm"
+  EnvPrefix:
+    Type: "String"
+    Default: "stg"
+    AllowedValues:
+      - "stg"
+      - "prod"
+      - "common"
+
+Resources:
+  TerraformBackendS3Bucket:
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub
+        - "${AWS::AccountId}-${region}-${system}-${env}-terrafromremotebackend"
+        - system: !Ref SystemPrefix
+          env: !Ref EnvPrefix
+          region: "tyo"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: "Enabled"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256

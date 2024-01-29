@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  SystemPrefix:
+    Type: "String"
+    Default: "opm"
+    AllowedValues:
+      - "opm"
+  EnvPrefix:
+    Type: "String"
+    Default: "stg"
+    AllowedValues:
+      - "stg"
+      - "prod"
+      - "common"
+
+Resources:
+  Admincli:
+    Type: "AWS::IAM::Group"
+    Properties:
+      GroupName: !Sub
+        - "${system}-${env}-admincli"
+        - system: !Ref SystemPrefix
+          env: !Ref EnvPrefix
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AdministratorAccess"
+
+  IampolicyMfa:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      Groups:
+        - !Ref Admincli
+      ManagedPolicyName: !Sub
+        - "${system}-${env}-policy-RequiresMfa"
+        - system: !Ref SystemPrefix
+          env: !Ref EnvPrefix
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "RequiresMfa"
+            Effect: "Deny"
+            NotAction:
+              - "iam:ResyncMFADevice"
+              - "iam:ListMFADevices"
+            Resource: "*"
+            Condition:
+              BoolIfExists:
+                "aws:MultiFactorAuthPresent": "false"
+
+Outputs:
+  AdmincliGroupName:
+    Value: !Ref Admincli
+    Export:
+      Name: !Sub
+        - "${AWS::StackName}-${env}-${name}"
+        - env: !Ref EnvPrefix
+          name: "Admincli"

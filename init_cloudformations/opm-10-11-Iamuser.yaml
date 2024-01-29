@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  SystemPrefix:
+    Type: "String"
+    Default: "opm"
+    AllowedValues:
+      - "opm"
+  EnvPrefix:
+    Type: "String"
+    Default: "stg"
+    AllowedValues:
+      - "stg"
+      - "prod"
+      - "common"
+
+Resources:
+  IamuserAdmincli:
+    Type: "AWS::IAM::User"
+    Properties:
+      Path: /
+      UserName: !Sub
+        - "${system}-${env}-user-admincli"
+        - system: !Ref SystemPrefix
+          env: !Ref EnvPrefix
+      Groups:
+        - Fn::ImportValue: !Sub
+            - "${stack}-${env}-${name}"
+            - stack: opm-10-01-Iamgroup
+              env: !Ref EnvPrefix
+              name: Admincli

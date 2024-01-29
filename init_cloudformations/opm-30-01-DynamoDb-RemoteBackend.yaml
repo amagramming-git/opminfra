@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  SystemPrefix:
+    Type: "String"
+    Default: "opm"
+    AllowedValues:
+      - "opm"
+  EnvPrefix:
+    Type: "String"
+    Default: "stg"
+    AllowedValues:
+      - "stg"
+      - "prod"
+      - "common"
+
+Resources:
+  TerraformBackendStateLockTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: !Sub
+        - "${system}-${env}-dynamodb-terrafromremotebackend"
+        - system: !Ref SystemPrefix
+          env: !Ref EnvPrefix
+      BillingMode: "PAY_PER_REQUEST"
+      AttributeDefinitions:
+        - AttributeName: "LockID"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "LockID"
+          KeyType: "HASH"
