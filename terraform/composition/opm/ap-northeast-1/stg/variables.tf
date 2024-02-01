@@ -56,3 +56,13 @@ variable "single_nat_gateway" {
   type        = bool
   default     = false
 }
+
+
+########################################
+# ACM
+########################################
+variable "domain" {
+  description = "A domain name for which the certificate should be issued"
+  type        = string
+  default     = ""
+}

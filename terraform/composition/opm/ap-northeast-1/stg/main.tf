@@ -16,3 +16,11 @@ module "vpc" {
   app_name = var.app_name
   region   = var.region
 }
+
+########################################
+# ACM
+########################################
+module "acm" {
+  source = "../../../../infrastructure_modules/acm"
+  domain = var.domain
+}

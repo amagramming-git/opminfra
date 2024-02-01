@@ -12,3 +12,9 @@ vpc_cidr             = "10.1.0.0/16"
 azs                  = ["ap-northeast-1a", "ap-northeast-1c", "ap-northeast-1d"]
 enable_nat_gateway   = "true"
 single_nat_gateway   = "true"
+
+
+########################################
+# ACM
+########################################
+domain = "open-memo.com"
