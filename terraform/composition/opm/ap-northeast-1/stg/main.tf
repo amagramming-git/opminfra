@@ -22,5 +22,6 @@ module "vpc" {
 ########################################
 module "acm" {
   source = "../../../../infrastructure_modules/acm"
+  # domeinは同一のAWSアカウントにて購入済みとする。
   domain = var.domain
 }
