@@ -15,4 +15,9 @@ locals {
   )
   ## ECR ##
   ecr_tags = local.tags
+
+  ## ALB ##
+  alb_name = "alb-${var.region_tag[var.region]}-${var.env}-${var.app_name}"
+  alb_tags = local.tags
+
 }

@@ -57,3 +57,18 @@ repository_lifecycle_policy = {
   ]
 }
 repository_force_delete = "true"
+
+########################################
+# Application Load Balancer
+########################################
+enable_deletion_protection_alb = "false"
+security_group_ingress_rules_alb = {
+    all_https = {
+      from_port   = 443
+      to_port     = 443
+      ip_protocol = "tcp"
+      description = "HTTPS web traffic"
+      cidr_ipv4   = "0.0.0.0/0"
+    }
+  }
+ssl_policy = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"

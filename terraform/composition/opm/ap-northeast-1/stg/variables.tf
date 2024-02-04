@@ -39,12 +39,6 @@ variable "azs" {
   default     = []
 }
 
-variable "tags" {
-  description = "A mapping of tags to assign to security group"
-  type        = map(string)
-  default     = {}
-}
-
 variable "enable_nat_gateway" {
   description = "Should be true if you want to provision NAT Gateways for each of your private networks"
   type        = bool
@@ -142,4 +136,31 @@ variable "repository_lifecycle_policy" {
   description = "The policy document. This is a JSON formatted string. See more details about [Policy Parameters](http://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html#lifecycle_policy_parameters) in the official AWS docs"
   type        = any
   default     = {}
+}
+
+################################################################################
+# Load Balancer
+################################################################################
+
+
+variable "enable_deletion_protection_alb" {
+  description = "If `true`, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to `true`"
+  type        = bool
+  default     = true
+}
+
+variable "security_group_ingress_rules_alb" {
+  description = "Security group ingress rules to add to the security group created"
+  type        = any
+  default     = {}
+}
+
+variable "alb_name" {
+  description = "The name of the LB. This name must be unique within your AWS account, can have a maximum of 32 characters, must contain only alphanumeric characters or hyphens, and must not begin or end with a hyphen"
+  type        = string
+  default     = null
+}
+
+variable "ssl_policy" {
+  type        = string
 }

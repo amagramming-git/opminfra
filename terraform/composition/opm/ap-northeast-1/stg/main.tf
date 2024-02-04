@@ -73,3 +73,29 @@ module "ecr_repository_opmback" {
 
   tags = local.ecr_tags
 }
+
+########################################
+# Application Load Balancer
+########################################
+module "alb" {
+  source = "../../../../infrastructure_modules/alb"
+
+  alb_name = local.alb_name
+
+  vpc_id = module.vpc.vpc_id
+  subnets = module.vpc.public_subnets
+
+  enable_deletion_protection   = var.enable_deletion_protection_alb
+  security_group_ingress_rules = var.security_group_ingress_rules_alb
+  security_group_egress_rules  = {
+      all = {
+        ip_protocol = "-1"
+        cidr_ipv4   = module.vpc.vpc_cidr_block
+      }
+    }
+  certificate_arn = module.acm.acm_certificate_arn
+  ssl_policy      = var.ssl_policy
+
+  domain_name = var.domain
+  tags = local.alb_tags
+}
