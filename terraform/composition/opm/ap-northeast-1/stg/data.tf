@@ -13,4 +13,6 @@ locals {
       "VPC-Name" = local.vpc_name
     })
   )
+  ## ECR ##
+  ecr_tags = local.tags
 }

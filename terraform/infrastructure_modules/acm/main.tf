@@ -1,6 +1,7 @@
 # https://github.com/terraform-aws-modules/terraform-aws-acm/blob/master/examples/complete-dns-validation/main.tf
 # 20240201
 # 当システム用に大幅に編集しております。
+# 当ファイルではRoute53にてドメインを購入した前提としております。
 
 locals {
   # Removing trailing dot from domain - just to be sure
