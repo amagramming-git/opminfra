@@ -164,3 +164,55 @@ variable "alb_name" {
 variable "ssl_policy" {
   type        = string
 }
+
+################################################################################
+# ECS
+################################################################################
+
+variable "cluster_name" {
+  description = "Name of the cluster (up to 255 letters, numbers, hyphens, and underscores)"
+  type        = string
+  default     = ""
+}
+
+variable "image_back" {
+  description = "The image used to start a container. This string is passed directly to the Docker daemon. By default, images in the Docker Hub registry are available. Other repositories are specified with either `repository-url/image:tag` or `repository-url/image@digest`"
+  type        = string
+  default     = null
+}
+
+variable "containerPort_back" {
+  type        = number
+}
+
+variable "image_db" {
+  description = "The image used to start a container. This string is passed directly to the Docker daemon. By default, images in the Docker Hub registry are available. Other repositories are specified with either `repository-url/image:tag` or `repository-url/image@digest`"
+  type        = string
+  default     = null
+}
+
+variable "containerPort_db" {
+  type        = number
+}
+
+variable "subnet_ids_back" {
+  description = "List of subnets to associate with the task or service"
+  type        = list(string)
+  default     = []
+}
+
+variable "image_front" {
+  description = "The image used to start a container. This string is passed directly to the Docker daemon. By default, images in the Docker Hub registry are available. Other repositories are specified with either `repository-url/image:tag` or `repository-url/image@digest`"
+  type        = string
+  default     = null
+}
+
+variable "containerPort_front" {
+  type        = number
+}
+
+variable "subnet_ids_front" {
+  description = "List of subnets to associate with the task or service"
+  type        = list(string)
+  default     = []
+}

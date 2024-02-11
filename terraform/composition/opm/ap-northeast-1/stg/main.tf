@@ -99,3 +99,26 @@ module "alb" {
   domain_name = var.domain
   tags = local.alb_tags
 }
+########################################
+# ECS
+########################################
+module "ecs" {
+  source = "../../../../infrastructure_modules/ecs"
+
+  cluster_name = local.cluster_name
+
+  containerPort_back             = var.containerPort_back
+  image_back                     = var.image_back
+  containerPort_db               = var.containerPort_db
+  image_db                       = var.image_db
+  target_group_arn_back          = module.alb.target_groups["opmback"].arn
+  subnet_ids_back                = module.vpc.public_subnets
+  source_security_group_id_back  = module.alb.security_group_id
+  image_front                    = var.image_front
+  containerPort_front            = var.containerPort_front
+  target_group_arn_front         = module.alb.target_groups["opmfront"].arn
+  subnet_ids_front               = module.vpc.public_subnets
+  source_security_group_id_front = module.alb.security_group_id
+
+  tags = local.ecs_tags
+}

@@ -20,4 +20,7 @@ locals {
   alb_name = "alb-${var.region_tag[var.region]}-${var.env}-${var.app_name}"
   alb_tags = local.tags
 
+  ## ECS ##
+  cluster_name = "cluster-${var.region_tag[var.region]}-${var.env}-${var.app_name}"
+  ecs_tags = local.tags
 }

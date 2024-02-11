@@ -72,3 +72,13 @@ security_group_ingress_rules_alb = {
     }
   }
 ssl_policy = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
+
+########################################
+# ECS
+########################################
+image_back          = "kambe/opmback:1.0" # "public.ecr.aws/amazoncorretto/amazoncorretto:17"
+containerPort_back  = 8080
+image_db            = "kambe/opmback-mysql:1.0" # "public.ecr.aws/docker/library/mysql:5.7"
+containerPort_db    = 3306
+image_front         = "kambe/opmfront:1.0"
+containerPort_front = 3000

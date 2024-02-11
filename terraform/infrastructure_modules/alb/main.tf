@@ -39,9 +39,21 @@ module "alb" {
       certificate_arn             = var.certificate_arn
 
       forward = {
-        target_group_key = "ex_ecs"
+        target_group_key = "opmfront"
       }
       rules = {
+        opmback = {
+          priority = 1
+          actions = [{
+            type             = "forward"
+            target_group_arn = module.alb.target_groups["opmback"].arn
+          }]
+          conditions = [{
+            path_pattern = {
+              values = ["/api/*"]
+            }
+          }]
+        }
         ex-fixed-response = {
           priority = 3
           actions = [{
@@ -61,7 +73,7 @@ module "alb" {
   }
 
   target_groups = {
-    ex_ecs = {
+    opmfront = {
       backend_protocol                  = "HTTP"
       backend_port                      = "3000" # TODO
       target_type                       = "ip"
@@ -74,6 +86,29 @@ module "alb" {
         interval            = 30
         matcher             = "200"
         path                = "/"
+        port                = "traffic-port"
+        protocol            = "HTTP"
+        timeout             = 5
+        unhealthy_threshold = 2
+      }
+
+      # Theres nothing to attach here in this definition. Instead,
+      # ECS will attach the IPs of the tasks to this target group
+      create_attachment = false
+    }
+    opmback = {
+      backend_protocol                  = "HTTP"
+      backend_port                      = "8080"
+      target_type                       = "ip"
+      deregistration_delay              = 5
+      load_balancing_cross_zone_enabled = true
+
+      health_check = {
+        enabled             = true
+        healthy_threshold   = 5
+        interval            = 30
+        matcher             = "200"
+        path                = "/normaltest"
         port                = "traffic-port"
         protocol            = "HTTP"
         timeout             = 5
