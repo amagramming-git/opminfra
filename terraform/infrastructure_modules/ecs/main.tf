@@ -72,7 +72,7 @@ module "ecs" {
           }]
           environment = [
             { "name": "SPRING_DATASOURCE_URL", "value": "jdbc:mysql://localhost/openmemo" },
-            { "name": "ALLOWED_ORIGIN_OPMFRONT", "value": "https://open-memo.com" },
+            { "name": "ALLOWED_ORIGIN_OPMFRONT", "value": "https://stg.open-memo.com" },
             { "name": "JWT_KEY", "value": "jxgEQeXHuPq8VdbyYFNkANdudQ53YUn4" },
             { "name": "MYSQL_ROOT_PASSWORD", "value": "root" },
             { "name": "MYSQL_DATABASE", "value": "openmemo" },
@@ -128,18 +128,6 @@ module "ecs" {
           ]
         }
       }
-
-      # service_connect_configuration = {
-      #   namespace = aws_service_discovery_http_namespace.this.arn
-      #   service = {
-      #     client_alias = {
-      #       port     = local.container_port
-      #       dns_name = local.container_name
-      #     }
-      #     port_name      = local.container_name
-      #     discovery_name = local.container_name
-      #   }
-      # }
 
       load_balancer = {
         service = {

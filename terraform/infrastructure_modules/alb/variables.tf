@@ -4,6 +4,11 @@ variable "domain_name" {
   default     = "terraform-aws-modules.modules.tf"
 }
 
+variable "route53_domain_name" {
+  type        = string
+  default     = "terraform-aws-modules.modules.tf"
+}
+
 variable "alb_name" {
   description = "The name of the LB. This name must be unique within your AWS account, can have a maximum of 32 characters, must contain only alphanumeric characters or hyphens, and must not begin or end with a hyphen"
   type        = string

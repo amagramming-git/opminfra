@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Parameters:
-  SystemPrefix:
+  AppPrefix:
     Type: "String"
     Default: "opm"
     AllowedValues:
@@ -11,7 +11,6 @@ Parameters:
     AllowedValues:
       - "stg"
       - "prod"
-      - "common"
 
 Resources:
   TerraformBackendS3Bucket:
@@ -19,8 +18,8 @@ Resources:
     DeletionPolicy: Retain
     Properties:
       BucketName: !Sub
-        - "${AWS::AccountId}-${region}-${system}-${env}-terrafromremotebackend"
-        - system: !Ref SystemPrefix
+        - "${AWS::AccountId}-${region}-${app}-${env}-terrafromremotebackend"
+        - app: !Ref AppPrefix
           env: !Ref EnvPrefix
           region: "tyo"
       PublicAccessBlockConfiguration:

@@ -17,7 +17,7 @@ enable_nat_gateway   = "false"
 ########################################
 # ACM
 ########################################
-domain = "open-memo.com"
+route53_domain_name = "open-memo.com"
 
 ########################################
 # ECR Registry
@@ -37,6 +37,7 @@ registry_scan_rules                    = [
 
 repository_name_opmfront = "opmfront"
 repository_name_opmback  = "opmback"
+repository_name_opmdb    = "opmdb"
 
 create_lifecycle_policy           = "true"
 repository_lifecycle_policy = {
@@ -61,6 +62,7 @@ repository_force_delete = "true"
 ########################################
 # Application Load Balancer
 ########################################
+domain = "stg.open-memo.com"
 enable_deletion_protection_alb = "false"
 security_group_ingress_rules_alb = {
     all_https = {

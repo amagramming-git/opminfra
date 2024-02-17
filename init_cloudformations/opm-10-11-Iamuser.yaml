@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Parameters:
-  SystemPrefix:
+  AppPrefix:
     Type: "String"
     Default: "opm"
     AllowedValues:
@@ -11,7 +11,6 @@ Parameters:
     AllowedValues:
       - "stg"
       - "prod"
-      - "common"
 
 Resources:
   IamuserAdmincli:
@@ -19,12 +18,12 @@ Resources:
     Properties:
       Path: /
       UserName: !Sub
-        - "${system}-${env}-user-admincli"
-        - system: !Ref SystemPrefix
+        - "${app}-${env}-user-admincli"
+        - app: !Ref AppPrefix
           env: !Ref EnvPrefix
       Groups:
         - Fn::ImportValue: !Sub
-            - "${stack}-${env}-${name}"
-            - stack: opm-10-01-Iamgroup
+            - "${app}-${env}-${name}"
+            - app: !Ref AppPrefix
               env: !Ref EnvPrefix
               name: Admincli

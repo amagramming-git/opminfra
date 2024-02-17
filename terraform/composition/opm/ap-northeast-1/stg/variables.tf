@@ -60,6 +60,10 @@ variable "domain" {
   type        = string
   default     = ""
 }
+variable "route53_domain_name" {
+  type        = string
+  default     = "terraform-aws-modules.modules.tf"
+}
 
 ########################################
 # ECR Registry
@@ -115,6 +119,11 @@ variable "repository_name_opmfront" {
   default     = ""
 }
 variable "repository_name_opmback" {
+  description = "The name of the repository"
+  type        = string
+  default     = ""
+}
+variable "repository_name_opmdb" {
   description = "The name of the repository"
   type        = string
   default     = ""

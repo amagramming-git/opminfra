@@ -1,6 +1,6 @@
 
 data "aws_route53_zone" "this" {
-  name = var.domain_name
+  name = var.route53_domain_name
 }
 ##################################################################
 # Application Load Balancer
@@ -108,7 +108,7 @@ module "alb" {
         healthy_threshold   = 5
         interval            = 30
         matcher             = "200"
-        path                = "/normaltest"
+        path                = "/api/actuator/health"
         port                = "traffic-port"
         protocol            = "HTTP"
         timeout             = 5

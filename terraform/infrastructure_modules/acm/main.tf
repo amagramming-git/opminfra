@@ -5,7 +5,7 @@
 
 locals {
   # Removing trailing dot from domain - just to be sure
-  domain_name = trimsuffix(var.domain, ".") 
+  domain_name = trimsuffix(var.route53_domain_name, ".") 
 }
 
 ##########################################################
@@ -15,19 +15,19 @@ locals {
 
 data "aws_route53_zone" "this" {
   count = 1
-  name         = local.domain_name
+  name         = trimsuffix(var.route53_domain_name, ".") 
   private_zone = false
 }
 
 module "acm" {
   source = "../../resource_modules/security/acm"
 
-  domain_name = local.domain_name
+  domain_name = var.domain_name
   zone_id     = data.aws_route53_zone.this[0].zone_id
 
   validation_method = "DNS"
 
   tags = {
-    Name = local.domain_name
+    Name = var.domain_name
   }
 }

@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
 Parameters:
-  SystemPrefix:
+  AppPrefix:
     Type: "String"
     Default: "opm"
     AllowedValues:
@@ -12,15 +12,14 @@ Parameters:
     AllowedValues:
       - "stg"
       - "prod"
-      - "common"
 
 Resources:
   TerraformBackendStateLockTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
       TableName: !Sub
-        - "${system}-${env}-dynamodb-terrafromremotebackend"
-        - system: !Ref SystemPrefix
+        - "${app}-${env}-dynamodb-terrafromremotebackend"
+        - app: !Ref AppPrefix
           env: !Ref EnvPrefix
       BillingMode: "PAY_PER_REQUEST"
       AttributeDefinitions:
