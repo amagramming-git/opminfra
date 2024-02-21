@@ -33,27 +33,30 @@ variable "enable_deletion_protection" {
   default     = true
 }
 
-variable "security_group_ingress_rules" {
-  description = "Security group ingress rules to add to the security group created"
-  type        = any
-  default     = {}
-}
-
-variable "security_group_egress_rules" {
-  description = "Security group egress rules to add to the security group created"
-  type        = any
-  default     = {}
-}
-
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
   default     = {}
 }
 
+variable "target_groups" {
+  description = "Map of target group configurations to create"
+  type        = any
+  default     = {}
+}
+variable "listener_rules" {
+  type        = any
+  default     = {}
+}
+variable "fowerd_target_group_key" {
+  type        = string
+}
 variable "certificate_arn" {
   type        = string
 }
 variable "ssl_policy" {
+  type        = string
+}
+variable "vpc_cidr_block" {
   type        = string
 }

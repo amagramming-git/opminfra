@@ -2,12 +2,6 @@
 # 20240201
 # 当システム用に大幅に編集しております。
 # 当ファイルではRoute53にてドメインを購入した前提としております。
-
-locals {
-  # Removing trailing dot from domain - just to be sure
-  domain_name = trimsuffix(var.route53_domain_name, ".") 
-}
-
 ##########################################################
 # Example 1 (default case):
 # Using one AWS provider for both ACM and Route53 records

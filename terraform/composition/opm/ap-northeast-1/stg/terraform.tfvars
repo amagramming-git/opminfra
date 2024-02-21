@@ -4,6 +4,7 @@
 region           = "ap-northeast-1"
 app_name         = "opm"
 env              = "stg"
+domain           = "stg.open-memo.com"
 
 ########################################
 # VPC
@@ -35,9 +36,7 @@ registry_scan_rules                    = [
 # ECR Repository
 ########################################
 
-repository_name_opmfront = "opmfront"
-repository_name_opmback  = "opmback"
-repository_name_opmdb    = "opmdb"
+repository_names = ["opmfront","opmback","opmdb"]
 
 create_lifecycle_policy           = "true"
 repository_lifecycle_policy = {
@@ -60,20 +59,66 @@ repository_lifecycle_policy = {
 repository_force_delete = "true"
 
 ########################################
+# ACM
+########################################
+securet_names = ["JWT_KEY","MYSQL_ROOT_PASSWORD","MYSQL_PASSWORD"]
+
+########################################
 # Application Load Balancer
 ########################################
-domain = "stg.open-memo.com"
 enable_deletion_protection_alb = "false"
-security_group_ingress_rules_alb = {
-    all_https = {
-      from_port   = 443
-      to_port     = 443
-      ip_protocol = "tcp"
-      description = "HTTPS web traffic"
-      cidr_ipv4   = "0.0.0.0/0"
+ssl_policy                     = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
+
+fowerd_target_group_key = "opmfront"
+target_groups = {
+    opmfront = {
+      backend_protocol                  = "HTTP"
+      backend_port                      = "3000" # TODO
+      target_type                       = "ip"
+      deregistration_delay              = 5
+      load_balancing_cross_zone_enabled = true
+
+      health_check = {
+        enabled             = true
+        healthy_threshold   = 5
+        interval            = 30
+        matcher             = "200"
+        path                = "/"
+        port                = "traffic-port"
+        protocol            = "HTTP"
+        timeout             = 5
+        unhealthy_threshold = 2
+      }
+
+      # Theres nothing to attach here in this definition. Instead,
+      # ECS will attach the IPs of the tasks to this target group
+      create_attachment = false
+    }
+    opmback = {
+      backend_protocol                  = "HTTP"
+      backend_port                      = "8080"
+      target_type                       = "ip"
+      deregistration_delay              = 5
+      load_balancing_cross_zone_enabled = true
+
+      health_check = {
+        enabled             = true
+        healthy_threshold   = 5
+        interval            = 30
+        matcher             = "200"
+        path                = "/api/actuator/health"
+        port                = "traffic-port"
+        protocol            = "HTTP"
+        timeout             = 5
+        unhealthy_threshold = 2
+      }
+
+      # Theres nothing to attach here in this definition. Instead,
+      # ECS will attach the IPs of the tasks to this target group
+      create_attachment = false
     }
   }
-ssl_policy = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
+
 
 ########################################
 # ECS

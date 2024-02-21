@@ -17,8 +17,21 @@ module "alb" {
   enable_deletion_protection = var.enable_deletion_protection
 
   # Security Group
-  security_group_ingress_rules = var.security_group_ingress_rules
-  security_group_egress_rules = var.security_group_egress_rules
+  security_group_ingress_rules = {
+      all_https = {
+        from_port   = 443
+        to_port     = 443
+        ip_protocol = "tcp"
+        description = "HTTPS web traffic"
+        cidr_ipv4   = "0.0.0.0/0"
+      }
+    }
+  security_group_egress_rules = {
+      all = {
+        ip_protocol = "-1"
+        cidr_ipv4   = var.vpc_cidr_block
+      }
+    }
 
   # access_logs = {
   #   bucket = module.log_bucket.s3_bucket_id
@@ -39,87 +52,12 @@ module "alb" {
       certificate_arn             = var.certificate_arn
 
       forward = {
-        target_group_key = "opmfront"
+        target_group_key = var.fowerd_target_group_key
       }
-      rules = {
-        opmback = {
-          priority = 1
-          actions = [{
-            type             = "forward"
-            target_group_arn = module.alb.target_groups["opmback"].arn
-          }]
-          conditions = [{
-            path_pattern = {
-              values = ["/api/*"]
-            }
-          }]
-        }
-        ex-fixed-response = {
-          priority = 3
-          actions = [{
-            type         = "fixed-response"
-            content_type = "text/plain"
-            status_code  = 200
-            message_body = "This is a fixed response"
-          }]
-          conditions = [{
-            path_pattern = {
-              values = ["/fixed"]
-            }
-          }]
-        }
-      }
+      rules = var.listener_rules
     }
   }
-
-  target_groups = {
-    opmfront = {
-      backend_protocol                  = "HTTP"
-      backend_port                      = "3000" # TODO
-      target_type                       = "ip"
-      deregistration_delay              = 5
-      load_balancing_cross_zone_enabled = true
-
-      health_check = {
-        enabled             = true
-        healthy_threshold   = 5
-        interval            = 30
-        matcher             = "200"
-        path                = "/"
-        port                = "traffic-port"
-        protocol            = "HTTP"
-        timeout             = 5
-        unhealthy_threshold = 2
-      }
-
-      # Theres nothing to attach here in this definition. Instead,
-      # ECS will attach the IPs of the tasks to this target group
-      create_attachment = false
-    }
-    opmback = {
-      backend_protocol                  = "HTTP"
-      backend_port                      = "8080"
-      target_type                       = "ip"
-      deregistration_delay              = 5
-      load_balancing_cross_zone_enabled = true
-
-      health_check = {
-        enabled             = true
-        healthy_threshold   = 5
-        interval            = 30
-        matcher             = "200"
-        path                = "/api/actuator/health"
-        port                = "traffic-port"
-        protocol            = "HTTP"
-        timeout             = 5
-        unhealthy_threshold = 2
-      }
-
-      # Theres nothing to attach here in this definition. Instead,
-      # ECS will attach the IPs of the tasks to this target group
-      create_attachment = false
-    }
-  }
+  target_groups = var.target_groups
   # Route53 Record(s)
   route53_records = {
     A = {

@@ -113,20 +113,10 @@ variable "registry_replication_rules" {
 # Repository
 ################################################################################
 
-variable "repository_name_opmfront" {
+variable "repository_names" {
   description = "The name of the repository"
-  type        = string
-  default     = ""
-}
-variable "repository_name_opmback" {
-  description = "The name of the repository"
-  type        = string
-  default     = ""
-}
-variable "repository_name_opmdb" {
-  description = "The name of the repository"
-  type        = string
-  default     = ""
+  type        = list(string)
+  default     = []
 }
 
 variable "repository_force_delete" {
@@ -146,6 +136,15 @@ variable "repository_lifecycle_policy" {
   type        = any
   default     = {}
 }
+################################################################################
+# Securet Manager
+################################################################################
+
+variable "securet_names" {
+  description = "The name of the repository"
+  type        = list(string)
+  default     = []
+}
 
 ################################################################################
 # Load Balancer
@@ -158,21 +157,20 @@ variable "enable_deletion_protection_alb" {
   default     = true
 }
 
-variable "security_group_ingress_rules_alb" {
-  description = "Security group ingress rules to add to the security group created"
+variable "ssl_policy" {
+  type        = string
+}
+
+variable "fowerd_target_group_key" {
+  type        = string
+}
+
+variable "target_groups" {
+  description = "Map of target group configurations to create"
   type        = any
   default     = {}
 }
 
-variable "alb_name" {
-  description = "The name of the LB. This name must be unique within your AWS account, can have a maximum of 32 characters, must contain only alphanumeric characters or hyphens, and must not begin or end with a hyphen"
-  type        = string
-  default     = null
-}
-
-variable "ssl_policy" {
-  type        = string
-}
 
 ################################################################################
 # ECS
