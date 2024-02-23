@@ -575,3 +575,141 @@ output "validation_domains" {
   description = "List of distinct domain validation options. This is useful if subject alternative names contain wildcards."
   value       = module.acm.validation_domains
 }
+
+########################################
+# ECR Registry
+########################################
+
+# ECR Registry does not output values
+
+
+########################################
+# ECR Registry
+########################################
+
+output "repository_arn" {
+  description = "Full ARN of the repository"
+  value       = [ for value in module.ecr_repository : value.repository_arn ]
+}
+
+output "repository_registry_id" {
+  description = "The registry ID where the repository was created"
+  value       = [ for value in module.ecr_repository : value.repository_registry_id ]
+}
+
+output "repository_url" {
+  description = "The URL of the repository (in the form `aws_account_id.dkr.ecr.region.amazonaws.com/repositoryName`)"
+  value       = [ for value in module.ecr_repository : value.repository_url ]
+}
+
+########################################
+# Securet Manager
+########################################
+
+output "securet_id" {
+  value       = [ for value in module.securet : value.id ]
+}
+output "securet_arn" {
+  value       = [ for value in module.securet : value.arn ]
+}
+output "securet_replica" {
+  value       = [ for value in module.securet : value.replica ]
+}
+output "securet_tags_all" {
+  value       = [ for value in module.securet : value.tags_all ]
+}
+
+########################################
+# Application Load Balancer
+########################################
+
+output "alb_id" {
+  description = "The ID and ARN of the load balancer we created"
+  value       = module.alb.id
+}
+
+output "alb_arn" {
+  description = "The ID and ARN of the load balancer we created"
+  value       = module.alb.arn
+}
+
+output "alb_arn_suffix" {
+  description = "ARN suffix of our load balancer - can be used with CloudWatch"
+  value       = module.alb.arn_suffix
+}
+
+output "alb_dns_name" {
+  description = "The DNS name of the load balancer"
+  value       = module.alb.dns_name
+}
+
+output "alb_zone_id" {
+  description = "The zone_id of the load balancer to assist with creating DNS records"
+  value       = module.alb.zone_id
+}
+
+output "alb_listeners" {
+  description = "Map of listeners created and their attributes"
+  value       = module.alb.listeners
+  sensitive   = true
+}
+
+output "alb_listener_rules" {
+  description = "Map of listeners rules created and their attributes"
+  value       = module.alb.listener_rules
+  sensitive   = true
+}
+
+output "alb_target_groups" {
+  description = "Map of target groups created and their attributes"
+  value       = module.alb.target_groups
+}
+
+output "alb_security_group_arn" {
+  description = "Amazon Resource Name (ARN) of the security group"
+  value       = module.alb.security_group_arn
+}
+
+output "alb_security_group_id" {
+  description = "ID of the security group"
+  value       = module.alb.security_group_id
+}
+
+output "alb_route53_records" {
+  description = "The Route53 records created and attached to the load balancer"
+  value       = module.alb.route53_records
+}
+
+########################################
+# ECS
+########################################
+
+output "ecs_cluster_arn" {
+  description = "ARN that identifies the cluster"
+  value       = module.ecs.cluster_arn
+}
+
+output "ecs_cluster_id" {
+  description = "ID that identifies the cluster"
+  value       = module.ecs.cluster_id
+}
+
+output "ecs_cluster_name" {
+  description = "Name that identifies the cluster"
+  value       = module.ecs.cluster_name
+}
+
+output "ecs_cluster_capacity_providers" {
+  description = "Map of cluster capacity providers attributes"
+  value       = module.ecs.cluster_capacity_providers
+}
+
+#output "ecs_cluster_autoscaling_capacity_providers" {
+#  description = "Map of capacity providers created and their attributes"
+#  value       = module.ecs.autoscaling_capacity_providers
+#}
+
+output "ecs_services" {
+  description = "Map of services created and their attributes"
+  value       = module.ecs.services
+}
