@@ -133,19 +133,247 @@ module "ecs" {
   source = "../../../../infrastructure_modules/ecs"
 
   cluster_name = local.cluster_name
+  services     = {
+    backend = {
+      cpu    = 1024
+      memory = 2048
+      assign_public_ip = true
 
-  containerPort_back             = var.containerPort_back
-  image_back                     = "${module.ecr_repository[1].repository_url}:latest" # latest運用はやめたい
-  containerPort_db               = var.containerPort_db
-  image_db                       = "${module.ecr_repository[2].repository_url}:latest" # latest運用はやめたい
-  target_group_arn_back          = module.alb.target_groups["opmback"].arn
-  subnet_ids_back                = module.vpc.public_subnets
-  source_security_group_id_back  = module.alb.security_group_id
-  image_front                    = "${module.ecr_repository[0].repository_url}:latest" # latest運用はやめたい
-  containerPort_front            = var.containerPort_front
-  target_group_arn_front         = module.alb.target_groups["opmfront"].arn
-  subnet_ids_front               = module.vpc.public_subnets
-  source_security_group_id_front = module.alb.security_group_id
+      # Container definition(s)
+      container_definitions = {
+        opmback = {
+          cpu       = 512
+          memory    = 1024
+          essential = true
+          image     = "${module.ecr_repository["opmback"].repository_url}:1.0"
 
+          port_mappings = [
+            {
+              name          = "opmback"
+              containerPort = 8080
+              hostPort      = 8080
+              protocol      = "tcp"
+            }
+          ]
+
+          # Example image used requires access to write to root filesystem
+          readonly_root_filesystem = false
+
+          enable_cloudwatch_logging = true
+          log_configuration = {
+            log_driver = "awslogs"
+            options = {
+              awslogs-group         = "/aws/ecs/backend/opmback"
+              awslogs-region        = "ap-northeast-1"
+              awslogs-stream-prefix = "opmback"
+            }
+          }
+          dependencies = [{
+            containerName = "opmdb"
+            condition     = "START"
+          }]
+          environment = [
+            { "name": "SPRING_DATASOURCE_URL", "value": "jdbc:mysql://localhost/openmemo" },
+            { "name": "ALLOWED_ORIGIN_OPMFRONT", "value": "https://stg.open-memo.com" },
+            # { "name": "JWT_KEY", "value": "jxgEQeXHuPq8VdbyYFNkANdudQ53YUn4" },
+            # { "name": "MYSQL_ROOT_PASSWORD", "value": "root" },
+            { "name": "MYSQL_DATABASE", "value": "openmemo" },
+            { "name": "MYSQL_USER", "value": "openmemouser" },
+            # { "name": "MYSQL_PASSWORD", "value": "0pen_memo_user" },
+            { "name": "TZ", "value": "Asia/Tokyo" }
+          ]
+          secrets     = [
+            { 
+              "name": "JWT_KEY", 
+              "valueFrom": "${module.securet["JWT_KEY"].arn}"
+            },
+            { 
+              "name": "MYSQL_ROOT_PASSWORD", 
+              "valueFrom": "${module.securet["MYSQL_ROOT_PASSWORD"].arn}"
+            },
+            { 
+              "name": "MYSQL_PASSWORD", 
+              "valueFrom": "${module.securet["MYSQL_PASSWORD"].arn}"
+            }
+          ]
+        }
+        opmdb = {
+          cpu       = 512
+          memory    = 1024
+          essential = true
+          image     = "${module.ecr_repository["opmdb"].repository_url}:1.0"
+
+          port_mappings = [
+            {
+              name          = "opmdb"
+              containerPort = 3306
+              hostPort      = 3306
+              protocol      = "tcp"
+            }
+          ]
+
+          # Example image used requires access to write to root filesystem
+          readonly_root_filesystem = false
+
+          enable_cloudwatch_logging = true
+          log_configuration = {
+            log_driver = "awslogs"
+            options = {
+              awslogs-group         = "/aws/ecs/backend/opmdb"
+              awslogs-region        = "ap-northeast-1"
+              awslogs-stream-prefix = "opmdb"
+            }
+          }
+          environment = [
+            # { "name": "MYSQL_ROOT_PASSWORD", "value": "root" },
+            { "name": "MYSQL_DATABASE", "value": "openmemo" },
+            { "name": "MYSQL_USER", "value": "openmemouser" },
+            # { "name": "MYSQL_PASSWORD", "value": "0pen_memo_user" },
+            { "name": "TZ", "value": "Asia/Tokyo" },
+          ]
+          secrets     = [
+            { 
+              "name": "MYSQL_ROOT_PASSWORD", 
+              "valueFrom": "${module.securet["MYSQL_ROOT_PASSWORD"].arn}"
+            },
+            { 
+              "name": "MYSQL_PASSWORD", 
+              "valueFrom": "${module.securet["MYSQL_PASSWORD"].arn}"
+            }
+          ]
+        }
+      }
+
+      load_balancer = {
+        service = {
+          target_group_arn = module.alb.target_groups["opmback"].arn
+          container_name   = "opmback"
+          container_port   = 8080
+        }
+      }
+
+      # tasks_iam_role_name        = "opmback-tasks"
+      # tasks_iam_role_description = "Example tasks IAM role for opmback"
+      # tasks_iam_role_policies = {
+      #   ReadOnlyAccess = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+      # }
+      # tasks_iam_role_statements = [
+      #   {
+      #     actions   = ["s3:List*"]
+      #     resources = ["arn:aws:s3:::*"]
+      #   }
+      # ]
+
+      subnet_ids = module.vpc.public_subnets
+      security_group_rules = {
+        alb_ingress = {
+          type                     = "ingress"
+          from_port                = 8080
+          to_port                  = 8080
+          protocol                 = "tcp"
+          description              = "Service port"
+          source_security_group_id = module.alb.security_group_id
+        }
+        egress_all = {
+          type        = "egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    },
+    frontend = {
+        memory = 1024
+      cpu    = 512
+      assign_public_ip = true
+
+      # Container definition(s)
+      container_definitions = {
+        opmfront = {
+          cpu       = 512
+          memory    = 1024
+          essential = true
+          image     = "${module.ecr_repository["opmfront"].repository_url}:1.0"
+
+          port_mappings = [
+            {
+              name          = "opmfront"
+              containerPort = 3000
+              hostPort      = 3000
+              protocol      = "tcp"
+            }
+          ]
+
+          # Example image used requires access to write to root filesystem
+          readonly_root_filesystem = false
+
+          enable_cloudwatch_logging = true
+          log_configuration = {
+            log_driver = "awslogs"
+            options = {
+              awslogs-group         = "/aws/ecs/frontend/opmfront"
+              awslogs-region        = "ap-northeast-1"
+              awslogs-stream-prefix = "opmfront"
+            }
+          }
+          environment = [
+            { "name": "NODE_ENV", "value": "production" }
+          ]
+        }
+      }
+
+      # service_connect_configuration = {
+      #   namespace = aws_service_discovery_http_namespace.this.arn
+      #   service = {
+      #     client_alias = {
+      #       port     = local.container_port
+      #       dns_name = local.container_name
+      #     }
+      #     port_name      = local.container_name
+      #     discovery_name = local.container_name
+      #   }
+      # }
+
+      load_balancer = {
+        service = {
+          target_group_arn = module.alb.target_groups["opmfront"].arn
+          container_name   = "opmfront"
+          container_port   = 3000
+        }
+      }
+
+      # tasks_iam_role_name        = "opmfront-tasks"
+      # tasks_iam_role_description = "Example tasks IAM role for opmfront"
+      # tasks_iam_role_policies = {
+      #   ReadOnlyAccess = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+      # }
+      # tasks_iam_role_statements = [
+      #   {
+      #     actions   = ["s3:List*"]
+      #     resources = ["arn:aws:s3:::*"]
+      #   }
+      # ]
+
+      subnet_ids = module.vpc.public_subnets
+      security_group_rules = {
+        alb_ingress = {
+          type                     = "ingress"
+          from_port                = 3000
+          to_port                  = 3000
+          protocol                 = "tcp"
+          description              = "Service port"
+          source_security_group_id = module.alb.security_group_id
+        }
+        egress_all = {
+          type        = "egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+  }
   tags = local.ecs_tags
 }
