@@ -175,25 +175,22 @@ module "ecs" {
           environment = [
             { "name": "SPRING_DATASOURCE_URL", "value": "jdbc:mysql://localhost/openmemo" },
             { "name": "ALLOWED_ORIGIN_OPMFRONT", "value": "https://stg.open-memo.com" },
-            # { "name": "JWT_KEY", "value": "jxgEQeXHuPq8VdbyYFNkANdudQ53YUn4" },
-            # { "name": "MYSQL_ROOT_PASSWORD", "value": "root" },
             { "name": "MYSQL_DATABASE", "value": "openmemo" },
             { "name": "MYSQL_USER", "value": "openmemouser" },
-            # { "name": "MYSQL_PASSWORD", "value": "0pen_memo_user" },
             { "name": "TZ", "value": "Asia/Tokyo" }
           ]
           secrets     = [
             { 
               "name": "JWT_KEY", 
-              "valueFrom": "${module.securet["JWT_KEY"].arn}"
+              "valueFrom": "${module.securet["jwt_key"].arn}"
             },
             { 
               "name": "MYSQL_ROOT_PASSWORD", 
-              "valueFrom": "${module.securet["MYSQL_ROOT_PASSWORD"].arn}"
+              "valueFrom": "${module.securet["mysql_root_password"].arn}"
             },
             { 
               "name": "MYSQL_PASSWORD", 
-              "valueFrom": "${module.securet["MYSQL_PASSWORD"].arn}"
+              "valueFrom": "${module.securet["mysql_password"].arn}"
             }
           ]
         }
@@ -225,20 +222,18 @@ module "ecs" {
             }
           }
           environment = [
-            # { "name": "MYSQL_ROOT_PASSWORD", "value": "root" },
             { "name": "MYSQL_DATABASE", "value": "openmemo" },
             { "name": "MYSQL_USER", "value": "openmemouser" },
-            # { "name": "MYSQL_PASSWORD", "value": "0pen_memo_user" },
             { "name": "TZ", "value": "Asia/Tokyo" },
           ]
           secrets     = [
             { 
               "name": "MYSQL_ROOT_PASSWORD", 
-              "valueFrom": "${module.securet["MYSQL_ROOT_PASSWORD"].arn}"
+              "valueFrom": "${module.securet["mysql_root_password"].arn}"
             },
             { 
               "name": "MYSQL_PASSWORD", 
-              "valueFrom": "${module.securet["MYSQL_PASSWORD"].arn}"
+              "valueFrom": "${module.securet["mysql_password"].arn}"
             }
           ]
         }

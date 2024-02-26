@@ -61,7 +61,7 @@ repository_force_delete = "true"
 ########################################
 # ACM
 ########################################
-securet_names = ["JWT_KEY","MYSQL_ROOT_PASSWORD","MYSQL_PASSWORD"]
+securet_names = ["jwt_key","mysql_root_password","mysql_password"]
 
 ########################################
 # Application Load Balancer
